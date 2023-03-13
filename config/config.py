@@ -16,12 +16,14 @@ DB_HOST = os.getenv('DB_HOST')
 
 # Перечень команд бота
 DEFAULT_COMMANDS = (
-    ('start', "Запустить бота"),
-    ('help', "Вывести справку"),
-    ('newcontest', "Создать новую подборку задач")
+    ('start', 'Запустить бота'),
+    ('help', 'Вывести справку'),
+    ('newcontest', 'Создать новую подборку задач'),
+    ('findtask', 'Найти задачу по номеру')
 )
 
 # Константы
 MAIN_URL = 'https://codeforces.com'
 URL = 'https://codeforces.com/problemset?order=BY_SOLVED_DESC&locale=ru'
 # URL = 'https://codeforces.com/problemset/page/3?order=BY_SOLVED_DESC&locale=ru'
+DELAY = 3600
