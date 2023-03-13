@@ -132,4 +132,7 @@ dmypy.json
 .env
 
 # Database
-/database/bot_data.db
+*.db
+
+# other
+info.md
