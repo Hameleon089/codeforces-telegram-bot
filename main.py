@@ -22,6 +22,6 @@ if __name__ == '__main__':
     set_default_commands(bot)
 
     stream_1 = Thread(target=infinity_parse)
-#     stream_1.start()
+    stream_1.start()
     stream_2 = Thread(target=bot.infinity_polling)
     stream_2.start()

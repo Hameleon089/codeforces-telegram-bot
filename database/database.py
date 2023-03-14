@@ -1,27 +1,24 @@
 from typing import List, Optional
 
 from peewee import (CharField, ForeignKeyField, IntegerField, Model,
-                    PostgresqlDatabase, SqliteDatabase)
+                    PostgresqlDatabase)
 
 from config.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER, TASKS_LIMIT
 from logs.loggers import func_logger
 
-# db = PostgresqlDatabase(
-#     DB_NAME,
-#     user=DB_USER,
-#     password=DB_PASSWORD,
-#     host=DB_HOST
-# )
-
-db = SqliteDatabase('data.db')
+db = PostgresqlDatabase(
+    DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST
+)
 
 
 class BaseModel(Model):
     """Класс базовой модели ORM"""
 
     class Meta:
-        # database: PostgresqlDatabase = db
-        database: SqliteDatabase = db
+        database: PostgresqlDatabase = db
 
 
 class Contest(BaseModel):
