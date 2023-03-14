@@ -26,5 +26,5 @@ DEFAULT_COMMANDS = (
 # Константы
 MAIN_URL = 'https://codeforces.com'
 URL = 'https://codeforces.com/problemset?order=BY_SOLVED_DESC&locale=ru'
-DELAY = 3600
-TASKS_LIMIT = 10
+DELAY = 3600  # Задержка между парсингом сайта
+TASKS_LIMIT = 10  # Максимальное количество задач в контексте
