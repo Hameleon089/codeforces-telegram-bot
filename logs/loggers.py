@@ -12,7 +12,7 @@ def func_logger(func: Callable) -> Callable:
     Args:
         func: функция
 
-    :return: задекорированная функция
+    Returns: задекорированная функция
     """
 
     @functools.wraps(func)

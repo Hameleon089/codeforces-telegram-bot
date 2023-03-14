@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup as bs
 from loguru import logger
 
 from database.database import insert_to_db
+from config.config import DELAY, MAIN_URL, URL
 
 
 def parse_site(url: str, main_url: str) -> None:
@@ -31,7 +32,7 @@ def parse_site(url: str, main_url: str) -> None:
         td_set = row.find_all('td')
         number = td_set[0].a.string.strip()
 
-        link = td_set[0].a.get('href')
+        link = ''.join((main_url, td_set[0].a.get('href')))
 
         divs = td_set[1].find_all('div')
         name = divs[0].a.contents[0].strip()
@@ -73,7 +74,7 @@ def parse_site(url: str, main_url: str) -> None:
         parse_site(next_page, main_url)
 
 
-def infinity_parser(url: str, main_url: str, delay: int) -> None:
+def infinity_parse() -> None:
     """
     Бесконечно парсит сайт с заданной периодичностью
 
@@ -83,6 +84,7 @@ def infinity_parser(url: str, main_url: str, delay: int) -> None:
         delay (int): задержка в секундах
     """
     while True:
-
-        parse_site(url, main_url)
-        time.sleep(delay)
+        logger.debug('Начался парсинг сайта')
+        parse_site(URL, MAIN_URL)
+        logger.debug('Парсинг сайта завершен')
+        time.sleep(DELAY)

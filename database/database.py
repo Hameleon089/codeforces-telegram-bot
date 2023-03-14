@@ -3,7 +3,7 @@ from typing import List, Optional
 from peewee import (CharField, ForeignKeyField, IntegerField, Model,
                     PostgresqlDatabase, SqliteDatabase)
 
-from config.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER
+from config.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER, TASKS_LIMIT
 from logs.loggers import func_logger
 
 # db = PostgresqlDatabase(
@@ -25,7 +25,15 @@ class BaseModel(Model):
 
 
 class Contest(BaseModel):
-    """Класс Контест"""
+    """
+    Класс Контест
+
+    Attributes:
+        complexity: сложность задач
+        topic: тема задач
+    """
+    complexity = IntegerField()
+    topic = CharField()
 
 
 class Task(BaseModel):
@@ -39,7 +47,6 @@ class Task(BaseModel):
         complexity: сложность
         solutions_amt: количество решений
         contest: контест
-
     """
 
     number = CharField(unique=True)
@@ -82,7 +89,6 @@ def create_tables():
         db.create_tables([Contest, Task, Topic, TaskTopic])
 
 
-@func_logger
 def add_topics(topics: List[str], task: Task) -> None:
     """
     Добавляет темы для задачи
@@ -129,7 +135,7 @@ def insert_to_db(tasks_list: List[dict]) -> None:
 
 
 @func_logger
-def create_contest(topic: str, complexity: int) -> List[Task]:
+def create_contest(topic: str, complexity: int) -> tuple:
     """
     Создает подборку из 10 задач с заданной сложностью и темой
 
@@ -137,19 +143,23 @@ def create_contest(topic: str, complexity: int) -> List[Task]:
         topic: тема
         complexity: сложность
 
-    :return: список (подборка) задач
+    Returns: номер контеста и список (подборка) задач
     """
 
     with db.atomic():
-        contest = Contest.create()
         tasks_list = Task.select().join(TaskTopic).join(Topic).where(
             Topic.name == topic, Task.complexity == complexity, Task.contest == None
-        ).limit(10)
+        ).limit(TASKS_LIMIT)
+
+        if not tasks_list:
+            return None, tasks_list
+
+        contest = Contest.create(topic=topic, complexity=complexity)
         for task in tasks_list:
             task.contest = contest
             task.save()
 
-    return tasks_list
+    return contest, tasks_list
 
 
 @func_logger
@@ -157,9 +167,42 @@ def get_task(number: str) -> Optional[Task]:
     """
     Возвращает задачу из БД по номеру
 
-    :return: задача, если искомой задачи нет - None
+    Returns: задача, если искомой задачи нет - None
     """
 
-    with db.atomic():
-        task = Task.get_or_none(number=number)
+    task = Task.get_or_none(number=number)
     return task
+
+
+@func_logger
+def get_topics(task: Task) -> List[str]:
+    """
+    Возвращает список тем для задачи
+
+    Args:
+        task: задача
+
+    Returns: список тем
+    """
+
+    topics = Topic.select().join(TaskTopic).where(TaskTopic.task == task)
+    topics_name = list()
+    for topic in topics:
+        topics_name.append(topic.name)
+
+    return topics_name
+
+
+@func_logger
+def get_contest(num: int) -> Optional[Contest]:
+    """
+    Возвращает контест из БД по номеру
+
+    Args:
+        num: номер контеста
+
+    Returns: контест
+    """
+
+    contest = Contest.get_or_none(id=num)
+    return contest

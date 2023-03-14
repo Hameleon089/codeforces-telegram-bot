@@ -1,13 +1,13 @@
 import os
+from threading import Thread
 
 from loguru import logger
 from telebot.custom_filters import StateFilter
 
 import handlers
-from config.config import DELAY, MAIN_URL, URL
-from database.database import create_contest, create_tables
+from database.database import create_tables
 from loader import bot
-from utils.parser import infinity_parser
+from utils.parser import infinity_parse
 from utils.set_bot_commands import set_default_commands
 
 if __name__ == '__main__':
@@ -18,8 +18,10 @@ if __name__ == '__main__':
 
     create_tables()
 
-    # infinity_parser(URL, MAIN_URL, DELAY)
-
     bot.add_custom_filter(StateFilter(bot))
     set_default_commands(bot)
-    bot.infinity_polling()
+
+    stream_1 = Thread(target=infinity_parse)
+#     stream_1.start()
+    stream_2 = Thread(target=bot.infinity_polling)
+    stream_2.start()
